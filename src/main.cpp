@@ -81,7 +81,6 @@ class BezierCurve{
         glViewport(0,0,width,height);
         return 0;
     }
-
     void data_init(int res){
         std::vector<float> idx;
         this->res = res+1;
