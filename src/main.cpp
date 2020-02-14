@@ -14,8 +14,8 @@ class BezierCurve{
     int width,height;
     int seletNode = -1;
     std::vector<node> nodeList;
-    BezierCurve(){
-        if (init(800, 600) == -1){
+    BezierCurve(int w, int h, int r){
+        if (init(w, h) == -1){
             printf("Initialize error");
             return;
         }
@@ -24,7 +24,7 @@ class BezierCurve{
         glfwSetCursorPosCallback(window, cursor_position_callback);
         glfwSetMouseButtonCallback(window, mouse_button_callback);
         curveShader.initShader("shader/bezier.vert","shader/bezier.frag");
-        data_init(1000);
+        data_init(r);
     }
     node getMousePos(){
         double xpos, ypos;
@@ -83,12 +83,11 @@ class BezierCurve{
     }
     void data_init(int res){
         std::vector<float> idx;
-        this->res = res+1;
+        this->res = res;
         for (int i = 0; i <= res; i++)
-            idx.push_back(1./res*i);
+            idx.push_back(i);
         nodeList.push_back(node(-0.5,-0.5));
-        nodeList.push_back(node(0,0.5));
-        nodeList.push_back(node(0.5,-0.5));
+
         glGenVertexArrays(1,&VAO);
         glBindVertexArray(VAO);
         glGenBuffers(1, &VBO);
@@ -106,10 +105,18 @@ class BezierCurve{
             glClear(GL_COLOR_BUFFER_BIT);
             
             curveShader.use();
+            glEnable(GL_PROGRAM_POINT_SIZE);
+            curveShader.setBool("drawPoints", true);
+            glDrawArrays(GL_POINTS, 0, nodeList.size());
+
+            curveShader.setBool("drawPoints", false);
             curveShader.setVec2s("nodes",nodeList);
             curveShader.setInt("num",nodeList.size());
+            curveShader.setInt("res",res);
             glBindVertexArray(VAO);
             glDrawArrays(GL_LINE_STRIP,0,res);
+            
+
             
             //swap the buffers, check and call events
             glfwSwapBuffers(window);
@@ -122,6 +129,6 @@ class BezierCurve{
 };
 
 int main(){
-    BezierCurve curve = BezierCurve();
+    BezierCurve curve = BezierCurve(800, 600, 1000);
     curve.loop();
 }
