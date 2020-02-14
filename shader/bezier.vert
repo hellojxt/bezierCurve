@@ -29,6 +29,7 @@ void main(){
     //int x = int(t*2);
     vec2 ans = list1[0];
     gl_Position = vec4(ans.x, ans.y, 0, 1.0);
+
     color = vec3(0, 0, 1);
     radius = 0;
 }

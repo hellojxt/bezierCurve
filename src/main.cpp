@@ -29,15 +29,21 @@ class BezierCurve{
     node getMousePos(){
         double xpos, ypos;
         glfwGetCursorPos(window, &xpos, &ypos);
-        return node(xpos/width*2-1,ypos/height*2-1);
+        return node(xpos/width*2-1,1-ypos/height*2);
     }
     static void resize_callback(GLFWwindow * window, int width, int height){
         glViewport(0,0,width,height);
+        BezierCurve *curve = (BezierCurve *)glfwGetWindowUserPointer(window);
+        curve->width = width;
+        curve->height = height;
     }
     static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
     {
         BezierCurve *curve = (BezierCurve *)glfwGetWindowUserPointer(window);
         node pos = curve->getMousePos();
+        if (curve->seletNode >= 0){
+            curve->nodeList[curve->seletNode] = pos;
+        }
     }
     static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
     {
@@ -45,14 +51,18 @@ class BezierCurve{
         node pos = curve->getMousePos();
         if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS){
             for (unsigned int i = 0;i < curve->nodeList.size();i++){
-                if (pos.dist(curve->nodeList[i]) < 0.01){
+                if (pos.dist(curve->nodeList[i]) < 0.02){
                     curve->seletNode = i;
                     break;
                 }
             }
+            
         }
         if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
             curve->seletNode = -1;
+        if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE){
+            curve->nodeList.push_back(pos);
+        }
     }
     int init(int width, int height){
         this->width = width;
@@ -98,25 +108,28 @@ class BezierCurve{
     }
 
     void loop(){
-        
+        curveShader.use();
+        glEnable(GL_PROGRAM_POINT_SIZE);
+        glEnable(GL_BLEND);
+        glEnable(GL_LINE_SMOOTH);
+        glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glLineWidth(3);
         while(!glfwWindowShouldClose(window)){
             //rendering
             glClearColor(255,255,255,1);
             glClear(GL_COLOR_BUFFER_BIT);
             
-            curveShader.use();
-            glEnable(GL_PROGRAM_POINT_SIZE);
+
             curveShader.setBool("drawPoints", true);
+            curveShader.setVec2s("nodes",nodeList);
             glDrawArrays(GL_POINTS, 0, nodeList.size());
 
             curveShader.setBool("drawPoints", false);
-            curveShader.setVec2s("nodes",nodeList);
             curveShader.setInt("num",nodeList.size());
             curveShader.setInt("res",res);
             glBindVertexArray(VAO);
             glDrawArrays(GL_LINE_STRIP,0,res);
-            
-
             
             //swap the buffers, check and call events
             glfwSwapBuffers(window);

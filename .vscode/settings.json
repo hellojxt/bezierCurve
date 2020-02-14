@@ -1,3 +1,6 @@
 {
-    "glsllint.glslangValidatorPath": "E:\\glslang\\bin\\glslangValidator.exe"
+    "glsllint.glslangValidatorPath": "E:\\glslang\\bin\\glslangValidator.exe",
+    "files.associations": {
+        "cmath": "cpp"
+    }
 }
