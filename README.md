@@ -7,4 +7,5 @@
 
 ## Features
 - Editable Bezier curve
-- ...
+- Editable B spline curve
+- Editable control points, Color tips

@@ -3,22 +3,28 @@ layout (location = 0) in float idx;
 uniform vec2 nodes[10];
 uniform int num;
 uniform int res;
+uniform int level;
 uniform bool drawPoints;
-out vec3 color;
+uniform vec3 lineColor;
+uniform int selectIndex;
+uniform vec3 selectColor;
+out vec4 color;
 out float radius;
 void main(){
     if (drawPoints){
         vec2 node = nodes[int(idx)];
         gl_Position = vec4(node.x, node.y, 0, 1);
         gl_PointSize = 15;
-        color = vec3(1, 0, 0);
+        color = vec4(1, 0, 0, 1);
         radius = 0.7;
         return;
     }
     //https://en.wikipedia.org/wiki/De_Boor%27s_algorithm
     vec2 d[20];
     float t[20];
-    int p = 2;
+    int p = level;
+    if (p >= num)
+        p = num-1;
     for(int i = 0; i <= p;i++)
         t[i] = 0;
     for(int i = p+1;i < num;i++)
@@ -38,7 +44,10 @@ void main(){
             float alpha = (x - t[j+k-p]) / (t[j+1+k-r] - t[j+k-p]);
             d[j] = (1.0 - alpha) * d[j-1] + alpha * d[j];
         }
+    if (selectIndex >= k-p && selectIndex <=k)
+        color = vec4(selectColor,1);
+    else
+        color = vec4(lineColor,1);
     gl_Position = vec4(d[p], 0, 1.0);
-    color = vec3(0, 0, 1);
     radius = 0;
 }
