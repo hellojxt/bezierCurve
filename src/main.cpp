@@ -134,7 +134,6 @@ class BezierCurve{
             curveShader.setVec3("lineColor",1,0,0);
             curveShader.setInt("selectIndex", seletNode);
             curveShader.setInt("res",res);
-            
             glLineWidth(1);
             glDrawArrays(GL_LINE_STRIP,0,res);
 

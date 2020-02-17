@@ -1,11 +1,23 @@
-# Bezier curve editor
+# 曲线生成算法
 
-## Dependencies
-- MingGW compiler (win 32 bit)
+## 依赖
+- win10 (linux mac需要自己配置环境)
+- MingGW compiler (32位版本)
 - Visual Studio Code
-- glad, glfw, glm (all included in the repository)
+- opengl(glad, glfw), glm
 
-## Features
-- Editable Bezier curve
-- Editable B spline curve
-- Editable control points, Color tips
+## 已实现功能
+- 可编辑bezier曲线和B样条曲线
+- 可控制的行值点和颜色提示
+
+## 待实现功能
+- 曲线拼接
+- 条状带的生成与修改
+- 图元的表示与存储
+
+## 使用方法
+1. 安装VScode
+2. 安装MingGW（32位版本），将MingGW安装位置的bin文件夹路径加入到环境变量PATH中，官网网速不好，推荐直接安装包含MingGW的CodeBlocks
+3. git clone 本仓库到本地
+4. 用VScode打开项目文件夹，菜单Terminal->Configure Default Build Task，选择Build&run。
+5. Ctrl+Shift+B编译运行
