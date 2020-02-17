@@ -14,7 +14,7 @@ class BezierCurve{
     int width,height;
     int seletNode = -1;
     std::vector<node> nodeList;
-    BezierCurve(int w, int h, int r){
+    BezierCurve(int w, int h, int r, std::string shaderName){
         if (init(w, h) == -1){
             printf("Initialize error");
             return;
@@ -23,7 +23,9 @@ class BezierCurve{
         glfwSetFramebufferSizeCallback(window, resize_callback);
         glfwSetCursorPosCallback(window, cursor_position_callback);
         glfwSetMouseButtonCallback(window, mouse_button_callback);
-        curveShader.initShader("shader/bezier.vert","shader/bezier.frag");
+        std::string vertShaderName = "shader/" + shaderName + ".vert";
+        std::string fragShaderName = "shader/" + shaderName + ".frag";
+        curveShader.initShader(vertShaderName.c_str(),fragShaderName.c_str());
         data_init(r);
     }
     node getMousePos(){
@@ -87,7 +89,7 @@ class BezierCurve{
             printf("Fail to initialize GLAD.");
             return -1;
         }
-        //map from the range (-1 to 1) to (0, width) and (0, height)
+        //map from the range (-1 to 1) to (0, width) and (height, 0)
         glViewport(0,0,width,height);
         return 0;
     }
@@ -96,8 +98,8 @@ class BezierCurve{
         this->res = res;
         for (int i = 0; i <= res; i++)
             idx.push_back(i);
-        nodeList.push_back(node(-0.5,-0.5));
 
+        nodeList.push_back(node(-0.5,-0.5));
         glGenVertexArrays(1,&VAO);
         glBindVertexArray(VAO);
         glGenBuffers(1, &VBO);
@@ -115,6 +117,7 @@ class BezierCurve{
         glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glLineWidth(3);
+        glBindVertexArray(VAO);
         while(!glfwWindowShouldClose(window)){
             //rendering
             glClearColor(255,255,255,1);
@@ -128,7 +131,6 @@ class BezierCurve{
             curveShader.setBool("drawPoints", false);
             curveShader.setInt("num",nodeList.size());
             curveShader.setInt("res",res);
-            glBindVertexArray(VAO);
             glDrawArrays(GL_LINE_STRIP,0,res);
             
             //swap the buffers, check and call events
@@ -142,6 +144,6 @@ class BezierCurve{
 };
 
 int main(){
-    BezierCurve curve = BezierCurve(800, 600, 1000);
+    BezierCurve curve = BezierCurve(800, 600, 1000, std::string("bSpline"));
     curve.loop();
 }
