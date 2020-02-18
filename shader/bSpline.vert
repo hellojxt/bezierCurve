@@ -4,14 +4,14 @@ uniform vec2 nodes[10];
 uniform int num;
 uniform int res;
 uniform int level;
-uniform bool drawPoints;
+uniform int drawType;
 uniform vec3 lineColor;
 uniform int selectIndex;
 uniform vec3 selectColor;
 out vec4 color;
 out float radius;
 void main(){
-    if (drawPoints){
+    if (drawType == 0){
         vec2 node = nodes[int(idx)];
         gl_Position = vec4(node.x, node.y, 0, 1);
         gl_PointSize = 15;

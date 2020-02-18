@@ -124,11 +124,11 @@ class BezierCurve{
             glClear(GL_COLOR_BUFFER_BIT);
             
 
-            curveShader.setBool("drawPoints", true);
+            curveShader.setInt("drawType", 0);
             curveShader.setVec2s("nodes",nodeList);
             glDrawArrays(GL_POINTS, 0, nodeList.size());
 
-            curveShader.setBool("drawPoints", false);
+            curveShader.setInt("drawType", 1);
             curveShader.setInt("num",nodeList.size());
             curveShader.setInt("level",1);
             curveShader.setVec3("lineColor",1,0,0);
@@ -137,6 +137,7 @@ class BezierCurve{
             glLineWidth(1);
             glDrawArrays(GL_LINE_STRIP,0,res);
 
+            curveShader.setInt("drawType", 2);
             curveShader.setInt("level",3);
             curveShader.setVec3("lineColor",0,0,1);
             glLineWidth(3);
@@ -153,6 +154,6 @@ class BezierCurve{
 };
 
 int main(){
-    BezierCurve curve = BezierCurve(800, 600, 1000, std::string("bezier"));
+    BezierCurve curve = BezierCurve(800, 600, 1000, std::string("bSpline"));
     curve.loop();
 }
