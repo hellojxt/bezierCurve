@@ -139,7 +139,7 @@ class BezierCurve{
             curveShader.setInt("drawType", 1);
             curveShader.setInt("level",1);
             curveShader.setVec3("lineColor",1,0,0);
-            glLineWidth(1);
+            glLineWidth(2);
             glDrawArrays(GL_LINE_STRIP,0,res+1);
 
             //draw points
