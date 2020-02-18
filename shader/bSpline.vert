@@ -9,12 +9,13 @@ uniform int drawType;
 uniform vec3 lineColor;
 uniform int selectIndex;
 uniform vec3 selectColor;
+uniform float sweepWidth;
 out vec2 lineCenter;
 out float smoothLine;
 out vec4 color;
 out float radius;
 out float lineWidth;
-
+out float idxf;
 vec2 d[MAXNUM];
 float t[MAXNUM];
 int len;
@@ -88,11 +89,12 @@ void main(){
         vec3 p2 = De_Boor(i2 / res * (num-p),p);
         vec2 d = p2.xy - p1.xy;
         vec2 normal = cross(vec3(0, 0, 1),vec3(d,0)).xy;
-        normal = normalize(normal)*0.1;
+        normal = normalize(normal)*sweepWidth;
         gl_Position = vec4(p1.xy+dir*normal,0,1);
         smoothLine = 1;
         lineCenter = p1.xy;
-        lineWidth = 0.1;
+        lineWidth = sweepWidth;
+        idxf = i1 / res * (num-p);
         return;
     }
 }

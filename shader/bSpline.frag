@@ -5,7 +5,8 @@ in float radius;
 in float smoothLine;
 in vec2 lineCenter;
 in float lineWidth;
-
+in float idxf;
+uniform sampler2D sweepTex;
 uniform vec2 viewPort;
 void main(){
     if (radius > 0) {
@@ -20,9 +21,12 @@ void main(){
         else{
             vec2 p = (gl_FragCoord.xy/viewPort)*2 - vec2(1, 1);
             p = p - lineCenter;
+            float normal = length(p)/lineWidth;
             vec4 background = vec4(1,1,1,0);
-            float t = smoothstep(0.8, 1, length(p)/lineWidth);
-            FragColor = color*(1-t) + background*t;
+            vec4 texColor = texture(sweepTex,vec2(idxf*3, 0.5-normal/2));
+            float t = smoothstep(0.95, 1, normal);
+            FragColor = texColor*(1-t) + background*t;
+            //FragColor = color;
         }
     }
         

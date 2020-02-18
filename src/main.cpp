@@ -4,12 +4,15 @@
 #include<utils/shader.h>
 #include<utils/helper.h>
 #include<vector>
+#define STB_IMAGE_IMPLEMENTATION
+#include<utils/stb_image.h>
 
 class BezierCurve{
     public:
     GLFWwindow * window;
     Shader curveShader;
     unsigned int VAO,VBO;
+    unsigned int road_texture;
     int res;
     int width,height;
     int seletNode = -1;
@@ -27,6 +30,7 @@ class BezierCurve{
         std::string fragShaderName = "shader/" + shaderName + ".frag";
         curveShader.initShader(vertShaderName.c_str(),fragShaderName.c_str());
         data_init(r);
+        load_texture();
     }
     node getMousePos(){
         double xpos, ypos;
@@ -66,6 +70,8 @@ class BezierCurve{
             curve->nodeList.push_back(pos);
         }
     }
+
+    
     int init(int width, int height){
         this->width = width;
         this->height = height;
@@ -109,6 +115,27 @@ class BezierCurve{
         glEnableVertexAttribArray(0);
     }
 
+    void load_texture(){
+        int width, height, nrChannels;
+        glGenTextures(1, &road_texture);
+        glBindTexture(GL_TEXTURE_2D, road_texture);
+        // set the texture wrapping parameters
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        // set texture filtering parameters
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+        unsigned char *data = stbi_load("imgs/road_texture.jpg", &width, &height, &nrChannels, 0);
+        if (data)
+        {
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+            glGenerateMipmap(GL_TEXTURE_2D);
+        }
+        else
+            printf("Failed to load texture\n");
+        stbi_image_free(data);
+    }
+    
     void loop(){
         curveShader.use();
         glEnable(GL_PROGRAM_POINT_SIZE);
@@ -117,13 +144,15 @@ class BezierCurve{
         glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glBindVertexArray(VAO);
+        glBindTexture(GL_TEXTURE_2D, road_texture);
         curveShader.setVec3("selectColor", 1,0,1);
-        curveShader.setVec2("viewPort", width,height);
+        curveShader.setFloat("sweepWidth", 0.1);
         while(!glfwWindowShouldClose(window)){
             //rendering
             glClearColor(255,255,255,1);
             glClear(GL_COLOR_BUFFER_BIT);
             //set uniforms
+            curveShader.setVec2("viewPort", width,height);
             curveShader.setInt("num",nodeList.size());
             curveShader.setInt("selectIndex", seletNode);
             curveShader.setVec2s("nodes",nodeList);
@@ -157,6 +186,6 @@ class BezierCurve{
 };
 
 int main(){
-    BezierCurve curve = BezierCurve(800, 800, 1000, std::string("bSpline"));
+    BezierCurve curve = BezierCurve(1000, 1000, 1000, std::string("bSpline"));
     curve.loop();
 }
