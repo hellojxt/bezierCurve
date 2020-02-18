@@ -1,6 +1,7 @@
 #version 460 core
+#define MAXNUM 100
 layout (location = 0) in float idx;
-uniform vec2 nodes[10];
+uniform vec2 nodes[MAXNUM];
 uniform int num;
 uniform int res;
 uniform int level;
@@ -8,11 +9,12 @@ uniform int drawType;
 uniform vec3 lineColor;
 uniform int selectIndex;
 uniform vec3 selectColor;
+uniform vec2 viewPort;
 out vec4 color;
 out float radius;
 
-vec2 d[20];
-float t[20];
+vec2 d[MAXNUM];
+float t[MAXNUM];
 int len;
 
 //https://en.wikipedia.org/wiki/De_Boor%27s_algorithm
@@ -72,13 +74,13 @@ void main(){
     if (drawType == 2){
         float i1 = int(idx) / 2 * 2;
         float i2 = i1+2;
-        if (i2 > res){
-            i1 = i1 - 2;
-            i2 = i1 + 2;
-        }
         float dir = -1;
         if (int(idx) % 2 == 0)
             dir = 1;
+        if (i2 > res){
+            i2 = i1 - 2;
+            dir = -dir;
+        }
         vec3 p1 = De_Boor(i1 / res * (num-p),p);
         vec3 p2 = De_Boor(i2 / res * (num-p),p);
         vec2 d = p2.xy - p1.xy;

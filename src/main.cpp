@@ -96,7 +96,7 @@ class BezierCurve{
     void data_init(int res){
         std::vector<float> idx;
         this->res = res;
-        for (int i = 0; i <= res; i++)
+        for (int i = 0; i <= res+10; i++)
             idx.push_back(i);
 
         nodeList.push_back(node(-0.5,-0.5));
@@ -104,7 +104,7 @@ class BezierCurve{
         glBindVertexArray(VAO);
         glGenBuffers(1, &VBO);
         glBindBuffer(GL_ARRAY_BUFFER,VBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(float)*(res+1), &idx[0], GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(float)*(res+10), &idx[0], GL_STATIC_DRAW);
         glVertexAttribPointer(0, 1, GL_FLOAT, GL_FALSE, sizeof(float),(void*)0);
         glEnableVertexAttribArray(0);
     }
@@ -118,6 +118,7 @@ class BezierCurve{
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glBindVertexArray(VAO);
         curveShader.setVec3("selectColor", 1,0,1);
+        curveShader.setVec2("viewPort", width,height);
         while(!glfwWindowShouldClose(window)){
             //rendering
             glClearColor(255,255,255,1);
@@ -132,7 +133,7 @@ class BezierCurve{
             curveShader.setInt("drawType", 2);
             curveShader.setInt("level",3);
             curveShader.setVec3("lineColor",0,0,1);
-            glDrawArrays(GL_TRIANGLE_STRIP,0,res+1);
+            glDrawArrays(GL_TRIANGLE_STRIP,0,res+2);
 
             //draw polyline
             curveShader.setInt("drawType", 1);
