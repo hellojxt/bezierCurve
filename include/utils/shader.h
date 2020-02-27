@@ -122,12 +122,12 @@ public:
         glUniform1f(glGetUniformLocation(ID, name.c_str()), value); 
     }
     // ------------------------------------------------------------------------
-    void setVec2s(const std::string &name, const std::vector<node> & nodeList) const
+    void setVec2s(const std::string &name, const glm::vec2 * nodeList,int num) const
     { 
-        glUniform2fv(glGetUniformLocation(ID, name.c_str()), nodeList.size(), (const float *)&nodeList[0]); 
+        glUniform2fv(glGetUniformLocation(ID, name.c_str()), num, &nodeList[0][0]); 
     }
     void setVec2(const std::string &name, float x, float y) const
-    { 
+    {  
         glUniform2f(glGetUniformLocation(ID, name.c_str()), x, y); 
     }
     // ------------------------------------------------------------------------
