@@ -7,7 +7,6 @@
 #include<cstdio>
 #include<vector>
 
-
 class BsplineMode: public Mode{
     public:
     unsigned int road_texture;
@@ -15,7 +14,7 @@ class BsplineMode: public Mode{
     float res;
     Shader shader;
     glm::vec2 nodeList[100][100];
-    glm::vec2 ** nodeRefList[100][100];
+    Ref nodeRefList[100][100];
     int lineLen[100];
     int editLine = -1;
     bool inEdit = false;
@@ -25,15 +24,77 @@ class BsplineMode: public Mode{
         load_shader();
         memset(lineLen,0,sizeof(lineLen));
     } 
-    bool insert(glm::vec2 ** p){
+    void checkMerge(Node *n){
+        for(int i = 0;i <= editLine;i++){
+            if (nodeRefList[i][0].n == n || nodeRefList[i][lineLen[i]-1].n == n){
+                if (lineLen[i] == 0)
+                    continue;
+                for(int j = 0;j <= editLine;j++){
+                    if(j != i &&(nodeRefList[j][0].n || nodeRefList[j][lineLen[j]-1].n == n)){
+                        if (lineLen[j] == 0)
+                            continue;
+                        glm::vec2 temp1[100];
+                        Ref temp2[100];
+                        int len = 0;
+                        if (nodeRefList[i][0].n != n){
+                            for(int k = 0;k < lineLen[i];k++){
+                                temp1[len] = nodeList[i][k];
+                                temp2[len] = nodeRefList[i][k];
+                                len++;
+                            }
+                        }else{
+                            for(int k = lineLen[i]-1;k >= 0 ;k--){
+                                temp1[len] = nodeList[i][k];
+                                temp2[len] = nodeRefList[i][k];
+                                len++;
+                            }
+                        }
+
+                        if (nodeRefList[j][0].n == n){
+                            Ref r = nodeRefList[j][0];
+                            r.n->refPoint[r.refIdx].set(NULL,NULL);
+                            for(int k = 1;k < lineLen[j];k++){
+                                temp1[len] = nodeList[j][k];
+                                temp2[len] = nodeRefList[j][k];
+                                len++;
+                            }
+                        }else{
+                            Ref r = nodeRefList[j][lineLen[j]-1];
+                            r.n->refPoint[r.refIdx].set(NULL,NULL);
+                            for(int k = lineLen[j]-2;k >= 0;k--){
+                                temp1[len] = nodeList[j][k];
+                                temp2[len] = nodeRefList[j][k];
+                                len++;
+                            }
+                        }
+                        lineLen[j] = 0;
+                        lineLen[i] = len;
+                        for(int k = 0;k < len;k++){
+                            nodeList[i][k] = temp1[k];
+                            nodeRefList[i][k] = temp2[k];
+                            Ref r = nodeRefList[i][k];
+                            r.n->refPoint[r.refIdx].set(&nodeList[i][k],&nodeRefList[i][k]);
+                        }
+
+                    break;
+                    }
+                    
+                }
+                break;
+            }
+        }
+    }
+    void insert(Ref r){
         if (!inEdit){
             editLine++;
             inEdit = true;
         }
         int len = lineLen[editLine];
         lineLen[editLine]++;
-        nodeRefList[editLine][len] = p;
-        *p = &nodeList[editLine][len];
+        nodeRefList[editLine][len] = r;
+        (r.n)->refPoint[r.refIdx] = Refed(&nodeList[editLine][len],
+                                            &nodeRefList[editLine][len]);
+        nodeList[editLine][len] = (r.n)->pos;
     }
     void end_insert(){
         inEdit = false;

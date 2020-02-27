@@ -1,5 +1,6 @@
 #ifndef MODES_H
 #define MODES_H
+class Mode;
 #include<glad/glad.h>
 #include<GLFW/glfw3.h>
 #include<cstdio>
@@ -17,7 +18,8 @@ class Mode{
         height = h;
     }
     virtual void draw() = 0;
-    virtual bool insert(glm::vec2 ** p) = 0;
+    virtual void insert(Ref r) = 0;
     virtual void end_insert()=0;
+    virtual void checkMerge(Node* n)=0;
 };
 #endif

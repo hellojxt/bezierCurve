@@ -9,7 +9,7 @@
 
 GLFWwindow * window;
 std::vector<Mode*> shaders;
-node nodeList[1000];
+Node nodeList[1000];
 int nodeMaxIdx = -1;
 int selectNodeIdx = -1;
 Mode* currentShader;
@@ -40,7 +40,6 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
             selectNodeIdx = -1;
             currentShader->end_insert();
         }
-            
         for (int i = 0;i <= nodeMaxIdx;i++){
             if (glm::length(pos - nodeList[i].pos) < 10){
                 selectNodeIdx = i;
@@ -51,11 +50,23 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
     }
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE){
         if (selectNodeIdx >= 0){
-            for(int i = 0;i < nodeMaxIdx;i++){
+            Node* n = &nodeList[selectNodeIdx];
+            bool merge = false;
+            for(int i = 0;i <= nodeMaxIdx;i++){
                 if (glm::length(pos - nodeList[i].pos) < 10 && i != selectNodeIdx){
-                    
+                    for (int j = 0;j < nodeList[i].refNum;j++){
+                        n->refPoint[n->refNum] = nodeList[i].refPoint[j];
+                        n->refPoint[n->refNum].r->set(n, n->refNum);
+                        n->refNum++;
+                        merge = true;
+                    }
+                    nodeList[i].pos = glm::vec2(-1000,-1000);
+                    break;
                 }
             }
+            n->update();
+            if(merge)
+                currentShader->checkMerge(n);
         }
         selectNodeIdx = -1;
     }
